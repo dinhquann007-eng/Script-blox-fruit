@@ -1,0 +1,927 @@
+--// DINHQUANDZ UNIVERSAL FX
+--// MOBILE + PC
+--// DQ NEON RED LOGO + GLOW
+--// DRAG MENU + DRAG LOGO
+--// WEAPON + FRUIT FX
+--// REAL-TIME COLOR TRACKER
+--// NPC FILTER
+--// LIGHT OPTIMIZED
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+
+local Player = Players.LocalPlayer
+local Workspace = workspace
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+--==================================================
+-- CLEAN OLD
+--==================================================
+
+pcall(function()
+	local old = PlayerGui:FindFirstChild("UniversalFX")
+	if old then old:Destroy() end
+
+	local oldLoad = PlayerGui:FindFirstChild("UniversalFX_Loading")
+	if oldLoad then oldLoad:Destroy() end
+end)
+
+--==================================================
+-- SETTINGS
+--==================================================
+
+local Enabled = true
+local CurrentColor = Color3.fromRGB(255,255,255)
+local MC_FONT = Enum.Font.Arcade
+
+--==================================================
+-- COLORS
+--==================================================
+
+local COLORS = {
+	{"Xanh lá",Color3.fromRGB(70,255,100)},
+	{"Xanh biển",Color3.fromRGB(50,150,255)},
+	{"Trắng",Color3.fromRGB(255,255,255)},
+	{"Đen",Color3.fromRGB(15,15,15)},
+	{"Đỏ",Color3.fromRGB(255,55,55)},
+	{"Bạc",Color3.fromRGB(210,220,230)},
+	{"Hồng cam",Color3.fromRGB(255,105,80)},
+	{"Đỏ thẫm",Color3.fromRGB(150,0,30)},
+	{"Vàng neon",Color3.fromRGB(255,255,0)},
+	{"Xanh ngọc lam",Color3.fromRGB(64,224,208)},
+	{"Hồng kem",Color3.fromRGB(255,190,200)},
+	{"Xanh rêu",Color3.fromRGB(85,107,47)},
+	{"Violet Red",Color3.fromRGB(208,32,144)},
+	{"Màu hổ phách",Color3.fromRGB(255,191,0)},
+	{"Bạch kim",Color3.fromRGB(229,228,226)},
+	{"Xanh dương vũ trụ",Color3.fromRGB(25,55,150)},
+	{"Tím thạch anh",Color3.fromRGB(138,43,226)},
+	{"Cam đen",Color3.fromRGB(180,65,15)}
+}
+
+--==================================================
+-- LOADING
+--==================================================
+
+local LoadingGui = Instance.new("ScreenGui")
+LoadingGui.Name = "UniversalFX_Loading"
+LoadingGui.IgnoreGuiInset = true
+LoadingGui.ResetOnSpawn = false
+LoadingGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+LoadingGui.DisplayOrder = 999
+LoadingGui.Parent = PlayerGui
+
+local LoadingBG = Instance.new("Frame")
+LoadingBG.Size = UDim2.fromScale(1,1)
+LoadingBG.BackgroundColor3 = Color3.fromRGB(8,8,8)
+LoadingBG.BorderSizePixel = 0
+LoadingBG.Parent = LoadingGui
+
+local LoadingTitle = Instance.new("TextLabel")
+LoadingTitle.Size = UDim2.new(1,0,0,50)
+LoadingTitle.Position = UDim2.fromScale(0,0.39)
+LoadingTitle.BackgroundTransparency = 1
+LoadingTitle.Text = "DINHQUANDZ"
+LoadingTitle.TextColor3 = Color3.fromRGB(255,40,40)
+LoadingTitle.TextSize = 28
+LoadingTitle.Font = MC_FONT
+LoadingTitle.Parent = LoadingBG
+
+local LoadingText = Instance.new("TextLabel")
+LoadingText.Size = UDim2.new(1,0,0,35)
+LoadingText.Position = UDim2.fromScale(0,0.47)
+LoadingText.BackgroundTransparency = 1
+LoadingText.Text = "Đang khởi động..."
+LoadingText.TextColor3 = Color3.fromRGB(190,190,190)
+LoadingText.TextSize = 14
+LoadingText.Font = MC_FONT
+LoadingText.Parent = LoadingBG
+
+local BarBG = Instance.new("Frame")
+BarBG.Size = UDim2.fromOffset(250,9)
+BarBG.Position = UDim2.new(.5,-125,.53,0)
+BarBG.BackgroundColor3 = Color3.fromRGB(35,35,35)
+BarBG.BorderSizePixel = 0
+BarBG.Parent = LoadingBG
+
+local BarCorner = Instance.new("UICorner")
+BarCorner.CornerRadius = UDim.new(1,0)
+BarCorner.Parent = BarBG
+
+local Bar = Instance.new("Frame")
+Bar.Size = UDim2.new(0,0,1,0)
+Bar.BackgroundColor3 = Color3.fromRGB(255,0,0)
+Bar.BorderSizePixel = 0
+Bar.Parent = BarBG
+
+local BarCorner2 = Instance.new("UICorner")
+BarCorner2.CornerRadius = UDim.new(1,0)
+BarCorner2.Parent = Bar
+
+local Percent = Instance.new("TextLabel")
+Percent.Size = UDim2.new(1,0,0,25)
+Percent.Position = UDim2.fromScale(0,.55)
+Percent.BackgroundTransparency = 1
+Percent.Text = "0%"
+Percent.TextColor3 = Color3.new(1,1,1)
+Percent.TextSize = 14
+Percent.Font = MC_FONT
+Percent.Parent = LoadingBG
+
+-- Loading animation
+task.spawn(function()
+	for i = 0,100 do
+		if not LoadingGui.Parent then return end
+
+		Bar.Size = UDim2.new(i/100,0,1,0)
+		Percent.Text = tostring(i) .. "%"
+
+		if i < 30 then
+			LoadingText.Text = "Đang khởi động..."
+		elseif i < 60 then
+			LoadingText.Text = "Đang tải FX..."
+		elseif i < 90 then
+			LoadingText.Text = "Đang kết nối..."
+		else
+			LoadingText.Text = "Hoàn tất!"
+		end
+
+		task.wait(0.015)
+	end
+
+	task.wait(0.25)
+
+	if LoadingGui then
+		LoadingGui:Destroy()
+	end
+end)
+
+--==================================================
+-- MAIN GUI
+--==================================================
+
+local Gui = Instance.new("ScreenGui")
+Gui.Name = "UniversalFX"
+Gui.IgnoreGuiInset = true
+Gui.ResetOnSpawn = false
+Gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+Gui.DisplayOrder = 1000
+Gui.Parent = PlayerGui
+
+--==================================================
+-- DQ NEON LOGO
+--==================================================
+
+local Toggle = Instance.new("TextButton")
+Toggle.Name = "DQLogo"
+Toggle.Size = UDim2.fromOffset(58,58)
+Toggle.Position = UDim2.fromOffset(20,180)
+
+Toggle.Text = "DQ"
+Toggle.TextSize = 21
+Toggle.Font = MC_FONT
+Toggle.TextColor3 = Color3.fromRGB(255,255,255)
+
+Toggle.BackgroundColor3 = Color3.fromRGB(255,0,0)
+Toggle.BorderSizePixel = 0
+Toggle.Active = true
+Toggle.AutoButtonColor = false
+Toggle.ZIndex = 50
+Toggle.Parent = Gui
+
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim.new(1,0)
+ToggleCorner.Parent = Toggle
+
+local ToggleStroke = Instance.new("UIStroke")
+ToggleStroke.Name = "NeonBorder"
+ToggleStroke.Thickness = 3
+ToggleStroke.Color = Color3.fromRGB(255,80,80)
+ToggleStroke.Transparency = 0
+ToggleStroke.Parent = Toggle
+
+local NeonGlow = Instance.new("UIStroke")
+NeonGlow.Name = "NeonGlow"
+NeonGlow.Thickness = 8
+NeonGlow.Color = Color3.fromRGB(255,0,0)
+NeonGlow.Transparency = 0.55
+NeonGlow.Parent = Toggle
+
+--==================================================
+-- NEON PULSE
+--==================================================
+
+task.spawn(function()
+	local t = 0
+
+	while Toggle and Toggle.Parent do
+		t += RunService.RenderStepped:Wait()
+
+		local pulse = (math.sin(t * 3) + 1) / 2
+
+		ToggleStroke.Color = Color3.fromRGB(
+			255,
+			math.floor(35 + pulse * 80),
+			math.floor(35 + pulse * 80)
+		)
+
+		NeonGlow.Transparency = 0.72 - pulse * 0.3
+	end
+end)
+
+--==================================================
+-- MENU
+--==================================================
+
+local Menu = Instance.new("Frame")
+Menu.Name = "FXMenu"
+Menu.Size = UDim2.fromOffset(280,370)
+Menu.Position = UDim2.fromOffset(20,250)
+Menu.BackgroundColor3 = Color3.fromRGB(18,18,18)
+Menu.BorderSizePixel = 0
+Menu.Visible = false
+Menu.Active = true
+Menu.ZIndex = 30
+Menu.Parent = Gui
+
+local MenuCorner = Instance.new("UICorner")
+MenuCorner.CornerRadius = UDim.new(0,12)
+MenuCorner.Parent = Menu
+
+local MenuStroke = Instance.new("UIStroke")
+MenuStroke.Thickness = 1
+MenuStroke.Transparency = 0.25
+MenuStroke.Color = Color3.fromRGB(255,50,50)
+MenuStroke.Parent = Menu
+
+--==================================================
+-- TITLE
+--==================================================
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1,-120,0,42)
+Title.Position = UDim2.fromOffset(10,3)
+Title.BackgroundTransparency = 1
+Title.Text = "DINHQUANDZ FX"
+Title.TextColor3 = Color3.new(1,1,1)
+Title.TextSize = 17
+Title.Font = MC_FONT
+Title.ZIndex = 35
+Title.Parent = Menu
+
+--==================================================
+-- DRAG BAR
+--==================================================
+
+local DragBar = Instance.new("TextButton")
+DragBar.Size = UDim2.new(1,-120,0,45)
+DragBar.Position = UDim2.fromOffset(0,0)
+DragBar.BackgroundTransparency = 1
+DragBar.Text = ""
+DragBar.Active = true
+DragBar.AutoButtonColor = false
+DragBar.ZIndex = 40
+DragBar.Parent = Menu
+
+--==================================================
+-- POWER
+--==================================================
+
+local Power = Instance.new("TextButton")
+Power.Size = UDim2.fromOffset(105,32)
+Power.Position = UDim2.new(1,-115,0,8)
+Power.Text = "FX: ON"
+Power.TextSize = 13
+Power.Font = MC_FONT
+Power.TextColor3 = Color3.new(1,1,1)
+Power.BackgroundColor3 = Color3.fromRGB(40,150,70)
+Power.BorderSizePixel = 0
+Power.ZIndex = 45
+Power.Parent = Menu
+
+local PowerCorner = Instance.new("UICorner")
+PowerCorner.CornerRadius = UDim.new(0,7)
+PowerCorner.Parent = Power
+
+--==================================================
+-- SCROLL
+--==================================================
+
+local Scroll = Instance.new("ScrollingFrame")
+Scroll.Size = UDim2.new(1,-20,1,-60)
+Scroll.Position = UDim2.fromOffset(10,50)
+Scroll.BackgroundTransparency = 1
+Scroll.BorderSizePixel = 0
+Scroll.ScrollBarThickness = 4
+Scroll.CanvasSize = UDim2.new(0,0,0,0)
+Scroll.Active = true
+Scroll.ZIndex = 31
+Scroll.Parent = Menu
+
+local Grid = Instance.new("UIGridLayout")
+Grid.CellSize = UDim2.fromOffset(120,42)
+Grid.CellPadding = UDim2.fromOffset(7,7)
+Grid.SortOrder = Enum.SortOrder.LayoutOrder
+Grid.Parent = Scroll
+
+Grid:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+	Scroll.CanvasSize = UDim2.fromOffset(
+		0,
+		Grid.AbsoluteContentSize.Y + 10
+	)
+end)
+
+--==================================================
+-- NPC FILTER
+--==================================================
+
+local function IsQuestNPC(obj)
+	local model
+
+	if obj:IsA("Model") then
+		model = obj
+	else
+		model = obj:FindFirstAncestorOfClass("Model")
+	end
+
+	if not model then
+		return false
+	end
+
+	local name = string.lower(model.Name)
+
+	local words = {
+		"quest",
+		"questgiver",
+		"quest_giver",
+		"quest giver",
+		"questnpc",
+		"quest npc",
+		"shopkeeper",
+		"dealer",
+		"merchant"
+	}
+
+	for _,word in ipairs(words) do
+		if string.find(name,word,1,true) then
+			return true
+		end
+	end
+
+	return false
+end
+
+--==================================================
+-- FX TYPE
+--==================================================
+
+local function IsFX(obj)
+	return obj:IsA("ParticleEmitter")
+		or obj:IsA("Trail")
+		or obj:IsA("Beam")
+		or obj:IsA("PointLight")
+		or obj:IsA("SpotLight")
+		or obj:IsA("SurfaceLight")
+		or obj:IsA("Highlight")
+		or obj:IsA("Fire")
+		or obj:IsA("Smoke")
+		or obj:IsA("Sparkles")
+end
+
+--==================================================
+-- APPLY COLOR
+--==================================================
+
+local function ApplyColor(obj)
+
+	if not Enabled then return end
+	if not obj or not obj.Parent then return end
+	if not IsFX(obj) then return end
+	if IsQuestNPC(obj) then return end
+
+	pcall(function()
+
+		if obj:IsA("ParticleEmitter")
+			or obj:IsA("Trail")
+			or obj:IsA("Beam") then
+
+			obj.Color = ColorSequence.new(CurrentColor)
+
+		elseif obj:IsA("PointLight")
+			or obj:IsA("SpotLight")
+			or obj:IsA("SurfaceLight") then
+
+			obj.Color = CurrentColor
+
+		elseif obj:IsA("Highlight") then
+
+			obj.FillColor = CurrentColor
+			obj.OutlineColor = CurrentColor
+
+		elseif obj:IsA("Fire") then
+
+			obj.Color = CurrentColor
+			obj.SecondaryColor = CurrentColor
+
+		elseif obj:IsA("Smoke") then
+
+			obj.Color = CurrentColor
+
+		elseif obj:IsA("Sparkles") then
+
+			obj.SparkleColor = CurrentColor
+
+		end
+
+	end)
+end
+
+--==================================================
+-- TRACK FX
+--==================================================
+
+local TrackedFX = {}
+local ConnectedContainers = {}
+
+local function TrackFX(obj)
+
+	if not obj then return end
+
+	if ConnectedContainers[obj] then
+		return
+	end
+
+	ConnectedContainers[obj] = true
+
+	for _,v in ipairs(obj:GetDescendants()) do
+		if IsFX(v) then
+			TrackedFX[v] = true
+			ApplyColor(v)
+		end
+	end
+
+	obj.DescendantAdded:Connect(function(v)
+
+		if IsFX(v) then
+			TrackedFX[v] = true
+			ApplyColor(v)
+
+			task.defer(function()
+				if v and v.Parent then
+					ApplyColor(v)
+				end
+			end)
+		end
+
+	end)
+end
+
+--==================================================
+-- CHARACTER
+--==================================================
+
+local function SetupCharacter(character)
+
+	if not character then return end
+
+	TrackFX(character)
+
+	for _,child in ipairs(character:GetChildren()) do
+		if child:IsA("Tool") then
+			TrackFX(child)
+		end
+	end
+
+	character.ChildAdded:Connect(function(child)
+
+		if child:IsA("Tool") then
+			TrackFX(child)
+		end
+
+	end)
+end
+
+if Player.Character then
+	SetupCharacter(Player.Character)
+end
+
+Player.CharacterAdded:Connect(function(character)
+
+	task.wait(0.2)
+	SetupCharacter(character)
+
+end)
+
+--==================================================
+-- BACKPACK
+--==================================================
+
+local Backpack = Player:WaitForChild("Backpack")
+
+TrackFX(Backpack)
+
+Backpack.ChildAdded:Connect(function(child)
+
+	if child:IsA("Tool") then
+		TrackFX(child)
+	end
+
+end)
+
+--==================================================
+-- TOOL TRACKER
+--==================================================
+
+local WatchedTools = {}
+
+local function WatchTool(tool)
+
+	if not tool:IsA("Tool") then return end
+	if WatchedTools[tool] then return end
+
+	WatchedTools[tool] = true
+
+	TrackFX(tool)
+
+	tool.Equipped:Connect(function()
+		TrackFX(tool)
+
+		task.defer(function()
+			TrackFX(tool)
+		end)
+	end)
+
+	tool.Activated:Connect(function()
+
+		TrackFX(tool)
+
+		local delays = {
+			0,
+			0.02,
+			0.05,
+			0.1,
+			0.2,
+			0.4
+		}
+
+		for _,delayTime in ipairs(delays) do
+
+			task.delay(delayTime,function()
+
+				if tool and tool.Parent then
+					TrackFX(tool)
+				end
+
+			end)
+
+		end
+
+	end)
+end
+
+for _,tool in ipairs(Backpack:GetChildren()) do
+	if tool:IsA("Tool") then
+		WatchTool(tool)
+	end
+end
+
+Backpack.ChildAdded:Connect(function(child)
+
+	if child:IsA("Tool") then
+		WatchTool(child)
+	end
+
+end)
+
+if Player.Character then
+
+	for _,tool in ipairs(Player.Character:GetChildren()) do
+
+		if tool:IsA("Tool") then
+			WatchTool(tool)
+		end
+
+	end
+
+end
+
+--==================================================
+-- WORKSPACE TRACKER
+--==================================================
+
+Workspace.DescendantAdded:Connect(function(obj)
+
+	if not Enabled then return end
+
+	if IsFX(obj) then
+		TrackedFX[obj] = true
+		ApplyColor(obj)
+	end
+
+end)
+
+--==================================================
+-- INITIAL WORKSPACE SCAN
+--==================================================
+
+task.spawn(function()
+
+	local list = Workspace:GetDescendants()
+
+	for i,obj in ipairs(list) do
+
+		if IsFX(obj) then
+			TrackedFX[obj] = true
+			ApplyColor(obj)
+		end
+
+		if i % 200 == 0 then
+			RunService.Heartbeat:Wait()
+		end
+
+	end
+
+end)
+
+--==================================================
+-- REAL-TIME COLOR
+--==================================================
+
+local counter = 0
+
+RunService.Heartbeat:Connect(function()
+
+	if not Enabled then return end
+
+	counter += 1
+
+	if counter < 3 then
+		return
+	end
+
+	counter = 0
+
+	for obj in pairs(TrackedFX) do
+
+		if not obj or not obj.Parent then
+
+			TrackedFX[obj] = nil
+
+		elseif IsFX(obj) then
+
+			ApplyColor(obj)
+
+		else
+
+			TrackedFX[obj] = nil
+
+		end
+
+	end
+
+end)
+
+--==================================================
+-- COLOR BUTTONS
+--==================================================
+
+for index,data in ipairs(COLORS) do
+
+	local name = data[1]
+	local color = data[2]
+
+	local Button = Instance.new("TextButton")
+
+	Button.Name = "Color_" .. name
+	Button.Text = name
+	Button.TextSize = 13
+	Button.Font = MC_FONT
+	Button.TextColor3 = Color3.new(1,1,1)
+	Button.BackgroundColor3 = color
+	Button.BorderSizePixel = 0
+	Button.LayoutOrder = index
+	Button.ZIndex = 32
+	Button.Parent = Scroll
+
+	local Corner = Instance.new("UICorner")
+	Corner.CornerRadius = UDim.new(0,8)
+	Corner.Parent = Button
+
+	Button.Activated:Connect(function()
+
+		CurrentColor = color
+
+		for obj in pairs(TrackedFX) do
+
+			if obj and obj.Parent then
+				ApplyColor(obj)
+			end
+
+		end
+
+	end)
+
+end
+
+--==================================================
+-- POWER
+--==================================================
+
+Power.Activated:Connect(function()
+
+	Enabled = not Enabled
+
+	if Enabled then
+
+		Power.Text = "FX: ON"
+		Power.BackgroundColor3 = Color3.fromRGB(40,150,70)
+
+		if Player.Character then
+			TrackFX(Player.Character)
+		end
+
+		TrackFX(Backpack)
+
+	else
+
+		Power.Text = "FX: OFF"
+		Power.BackgroundColor3 = Color3.fromRGB(150,45,45)
+
+	end
+
+end)
+
+--==================================================
+-- OPEN / CLOSE MENU
+--==================================================
+
+local logoDragging = false
+local logoMoved = false
+local logoStart
+local logoPosition
+
+Toggle.InputBegan:Connect(function(input)
+
+	if input.UserInputType ~= Enum.UserInputType.MouseButton1
+		and input.UserInputType ~= Enum.UserInputType.Touch then
+		return
+	end
+
+	logoDragging = true
+	logoMoved = false
+	logoStart = input.Position
+	logoPosition = Toggle.Position
+
+end)
+
+--==================================================
+-- DRAG MENU
+--==================================================
+
+local menuDragging = false
+local menuStart
+local menuPosition
+
+DragBar.InputBegan:Connect(function(input)
+
+	if input.UserInputType ~= Enum.UserInputType.MouseButton1
+		and input.UserInputType ~= Enum.UserInputType.Touch then
+		return
+	end
+
+	menuDragging = true
+	menuStart = input.Position
+	menuPosition = Menu.Position
+
+end)
+
+--==================================================
+-- INPUT MOVE
+--==================================================
+
+UIS.InputChanged:Connect(function(input)
+
+	-- MENU
+	if menuDragging then
+
+		if input.UserInputType == Enum.UserInputType.MouseMovement
+			or input.UserInputType == Enum.UserInputType.Touch then
+
+			local delta = input.Position - menuStart
+
+			local x = menuPosition.X.Offset + delta.X
+			local y = menuPosition.Y.Offset + delta.Y
+
+			local camera = Workspace.CurrentCamera
+
+			if camera then
+
+				local viewport = camera.ViewportSize
+
+				x = math.clamp(
+					x,
+					0,
+					math.max(0,viewport.X - Menu.AbsoluteSize.X)
+				)
+
+				y = math.clamp(
+					y,
+					0,
+					math.max(0,viewport.Y - Menu.AbsoluteSize.Y)
+				)
+
+			end
+
+			Menu.Position = UDim2.fromOffset(x,y)
+
+		end
+
+	end
+
+	-- LOGO
+	if logoDragging then
+
+		if input.UserInputType == Enum.UserInputType.MouseMovement
+			or input.UserInputType == Enum.UserInputType.Touch then
+
+			local delta = input.Position - logoStart
+
+			if math.abs(delta.X) > 5
+				or math.abs(delta.Y) > 5 then
+
+				logoMoved = true
+
+			end
+
+			local x = logoPosition.X.Offset + delta.X
+			local y = logoPosition.Y.Offset + delta.Y
+
+			local camera = Workspace.CurrentCamera
+
+			if camera then
+
+				local viewport = camera.ViewportSize
+				local padding = 8
+
+				x = math.clamp(
+					x,
+					padding,
+					math.max(
+						padding,
+						viewport.X - Toggle.AbsoluteSize.X - padding
+					)
+				)
+
+				y = math.clamp(
+					y,
+					padding,
+					math.max(
+						padding,
+						viewport.Y - Toggle.AbsoluteSize.Y - padding
+					)
+				)
+
+			end
+
+			Toggle.Position = UDim2.fromOffset(x,y)
+
+		end
+
+	end
+
+end)
+
+--==================================================
+-- INPUT END
+--==================================================
+
+UIS.InputEnded:Connect(function(input)
+
+	if input.UserInputType ~= Enum.UserInputType.MouseButton1
+		and input.UserInputType ~= Enum.UserInputType.Touch then
+		return
+	end
+
+	if menuDragging then
+		menuDragging = false
+	end
+
+	if logoDragging then
+
+		logoDragging = false
+
+		-- Chỉ mở menu nếu không kéo logo
+		if not logoMoved then
+			Menu.Visible = not Menu.Visible
+		end
+
+	end
+
+end)
+
+--==================================================
+-- FINISH
+--==================================================
+
+print("DINHQUANDZ UNIVERSAL FX LOADED")
